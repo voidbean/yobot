@@ -1253,7 +1253,7 @@ class ClanBattle:
             return str(boss_status)
         elif match_num == 5:  # 尾刀
             match = re.match(
-                r'^尾刀 ?(?:\+(.\+))? *(昨[日天])? *(?:[\:：](.*))?$', cmd)
+                r'^尾刀 ?(?:\+(.+))? *(昨[日天])? *(?:[\:：](.*))?$', cmd)
             if not match:
                 return
             behalf_qqid = self._get_qqid_by_nickname(match.group(1),group_id)
