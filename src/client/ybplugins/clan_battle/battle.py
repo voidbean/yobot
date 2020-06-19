@@ -134,6 +134,23 @@ class ClanBattle:
             ))
         return user.nickname or str(qqid)
 
+    def _get_qqid_by_nickname(self, nickname, group_id):
+        #member_list = self.get_member_list(self, groupid)
+        for user in User.select(
+                User, Clan_member,
+        ).join(
+            Clan_member,
+            on=(User.qqid == Clan_member.qqid),
+            attr='clan_member',
+        ).where(
+            Clan_member.group_id == group_id,
+            User.deleted == False,
+        ):
+            #            _logger.info(' {} {} {}'.format(user_id, group_id, cmd))
+            if nickname == user.nickname:
+                return user.qqid
+        return
+
     def _get_group_previous_challenge(self, group: Clan_group):
         Clan_challenge_alias = Clan_challenge.alias()
         query = Clan_challenge.select().where(
@@ -1199,7 +1216,7 @@ class ClanBattle:
             return boss_summary
         elif match_num == 4:  # 报刀
             match = re.match(
-                r'^报刀 ?(\d+)([Ww万Kk千])? *(?:\[CQ:at,qq=(\d+)\])? *(昨[日天])? *(?:[\:：](.*))?$', cmd)
+                r'^报刀 ?(\d+)([Ww万Kk千])? *(?:\+(.+))? *(昨[日天])? *(?:[\:：](.*))?$', cmd)
             if not match:
                 return
             unit = {
@@ -1211,7 +1228,9 @@ class ClanBattle:
                 '千': 1000,
             }.get(match.group(2), 1)
             damage = int(match.group(1)) * unit
-            behalf = match.group(3) and int(match.group(3))
+            behalf_qqid = self._get_qqid_by_nickname(match.group(3),group_id)
+            behalf = behalf_qqid and int(behalf_qqid)
+            # behalf = match.group(3) and int(match.group(3))
             previous_day = bool(match.group(4))
             extra_msg = match.group(5)
             if isinstance(extra_msg, str):
@@ -1234,10 +1253,12 @@ class ClanBattle:
             return str(boss_status)
         elif match_num == 5:  # 尾刀
             match = re.match(
-                r'^尾刀 ?(?:\[CQ:at,qq=(\d+)\])? *(昨[日天])? *(?:[\:：](.*))?$', cmd)
+                r'^尾刀 ?(?:\+(.\+))? *(昨[日天])? *(?:[\:：](.*))?$', cmd)
             if not match:
                 return
-            behalf = match.group(1) and int(match.group(1))
+            behalf_qqid = self._get_qqid_by_nickname(match.group(1),group_id)
+            behalf = behalf_qqid and int(behalf_qqid)
+            # behalf = match.group(1) and int(match.group(1))
             previous_day = bool(match.group(2))
             extra_msg = match.group(3)
             if isinstance(extra_msg, str):
