@@ -5,12 +5,14 @@
 安装环境
 
 ```shell
-# redhat / centos:
+# RHEL / CentOS:
 yum install -y java python3 screen wget git
-# debain / ubuntu 请使用 apt-get
+
+# Debain / Ubuntu
+# apt-get install -y java python3 screen wget git
 ```
 
-新建一个 linux 用户
+（可选）新建一个 linux 用户
 
 ```shell
 groupadd qqbot
@@ -31,11 +33,14 @@ mkdir -p ~/qqbot/yobot
 cd ~/qqbot/yobot
 
 # 下载源码
-git clone https://github.com/yuudi/yobot.git --depth=1
+git clone https://github.com/yuudi/yobot.git
+# 国内可改用 https://gitee.com/yobot/yobot.git
 
 cd yobot/src/client/
+
 # 安装依赖
 pip3 install -r requirements.txt --user
+# 国内可加上参数 -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 生成 yobotg
 python3 main.py
@@ -44,33 +49,30 @@ python3 main.py
 sh yobotg.sh
 ```
 
-按下 `ctrl-a c` 连续组合键，新建一个 screen shell
+按下 `ctrl-a , c` 连续组合键，新建一个 screen shell
 
-启动 mirai-console
+下载 mirai-console 和 cqhttp-mirai
 
 ```shell
-mkdir -p ~/qqbot/mirai
+mkdir -p ~/qqbot/mirai/plugins/CQHTTPMirai
 cd ~/qqbot/mirai
-wget https://github.com/mamoe/mirai-console-wrapper/releases/download/1.2.0/mirai-console-wrapper-1.2.0-all.jar
-java -jar mirai-console-wrapper-1.2.0-all.jar
+
+# 你可以在这里找到最新版本：https://github.com/mamoe/mirai-console-wrapper/releases
+wget https://github.com/mamoe/mirai-console-wrapper/releases/download/1.3.0/mirai-console-wrapper-1.3.0-all.jar
+# 国内可改用 http://yopan.loli.show/mirai-console-wrapper-1.3.0-all.jar
+
+cd plugins
+
+# 你可以在这里找到最新版本：https://github.com/yyuueexxiinngg/cqhttp-mirai/releases
+wget https://github.com/yyuueexxiinngg/cqhttp-mirai/releases/download/0.1.4/cqhttp-mirai-0.1.4-all.jar
+# 国内可改用 http://yopan.loli.show/mirai-plugins/CQHTTPMirai/CQHTTPMirai-0.1.4.jar
 ```
-
-在 mirai-console 里登录 QQ 并下载 CQHTTPMirai 插件
-
-```shell
-# （mirai-console内）
-login 123456789 ppaasswwdd # 注意改成你的QQ小号的账号密码
-install CQHTTPMirai
-```
-
-按下 `ctrl-a c` 连续组合键，新建一个 screen shell
 
 修改 CQHTTPMirai 配置文件
 
 ```shell
-mkdir -p ~/qqbot/mirai/plugins/CQHTTPMirai
 cd ~/qqbot/mirai/plugins/CQHTTPMirai
-vim setting.yml
+vi setting.yml
 ```
 
 修改配置文件如下（注意修改 QQ 号）
@@ -83,22 +85,23 @@ vim setting.yml
     postMessageFormat: string
     reverseHost: 127.0.0.1
     reversePort: 9222
-    reversePath: /ws
+    reversePath: /ws/
     accessToken: null
     reconnectInterval: 3000
 # 详细说明请参考 https://github.com/yyuueexxiinngg/cqhttp-mirai
 ```
 
-保存后按下 `ctrl-a 1` 连续组合键，回到 1 号 shell （即 mirai-console 所在的 shell）
-
-重新加载插件
+启动 mirai-console 并登录 QQ
 
 ```shell
+cd ~/qqbot/mirai
+java -jar mirai-console-wrapper-1.3.0-all.jar
+
 # （mirai-console内）
-reload
+login 123456789 ppaasswwdd # 注意改成你的QQ小号的账号密码
 ```
 
-部署完成，按下 `ctrl-a d` 连续组合键挂起这两个 shell
+部署完成，现在可以按下 `ctrl-a , d` 连续组合键挂起这两个 shell
 
 ## 验证安装
 
@@ -108,6 +111,6 @@ reload
 
 见[FAQ](../usage/faq.md)
 
-## 开始 web 模式
+## 开启 web 访问
 
 [开启方法](../usage/web-mode.md)
